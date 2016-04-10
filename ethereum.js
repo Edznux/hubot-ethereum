@@ -1,10 +1,12 @@
 // Description:
-//   Allows hubot query ethereum blockchain
+//   Allows hubot query ethereum blockchain and few ethereum api
 //
 // Dependencies:
+//   hubot-brain-redis
 //
 // Configuration:
 //   none
+//
 // Commands:
 //   ethereum balance
 //   ethereum check <address>
@@ -14,17 +16,31 @@
 //
 
 var https = require("https");
-var UNIT = 1000000000000000000;
-var aToCurrency = {"usd": "$", "eur":"€"};
-var currencyToA = {"$":"usd", "€": "eur"};
+
 
 function main(robot){
 	
-	setInterval(getPrice(function(err,data){
-		robot.brain.set("ether_price", data.price);
-		console.log(robot.brain.get("ether_price"));
-	}), 60000);
+	var UNIT = 1000000000000000000;
+	var aToCurrency = {"usd": "$", "eur":"€"};
+	var currencyToA = {"$":"usd", "€": "eur"};
+	var hu = require("./lib/hubot_utils.js");
+	hu.setRobot(robot);
+	console.log(hu);
+	var eu = require("./lib/ethereum_utils.js");
+	console.log(eu);
+	var nanopool = require("./lib/nanopool.js");
+	console.log(nanopool);
+	
 
+
+/*
+	setInterval(function(){
+		eu.getPrice(function(err,data){
+			robot.brain.set("ether_price", data.price);
+			console.log(robot.brain.get("ether_price"));
+		}
+	}), 60000);
+*/
 	robot.hear(/ethereum( .*)?/i, function(res){
 		var addr, tmp, user;
 		
@@ -37,7 +53,7 @@ function main(robot){
 				case /check/.test(res.match[1]):
 					tmp = res.match[1].split(" ");
 					addr = tmp[1];
-					getBalanceByAddr(addr, function(err, data){
+					eu.getBalanceByAddr(addr, function(err, data){
 						if(err){
 							res.send("Cannot get balance of " + addr);
 							return;
@@ -55,7 +71,7 @@ function main(robot){
 						res.send("Syntax error");
 						return;
 					}
-					addAddrToUser(tmp[1], user, function(err, data){
+					hu.addAddrToUser(tmp[1], user, function(err, data){
 						if(err){
 							res.send(err);
 						}else{
@@ -72,7 +88,7 @@ function main(robot){
 						res.send("Syntax error");
 						return;
 					}
-					deleteAddrToUser(tmp[1], user, function(err, data){
+					hu.deleteAddrToUser(tmp[1], user, function(err, data){
 						if(err){
 							res.send(err);
 						}else{
@@ -82,7 +98,7 @@ function main(robot){
 				break;
 				case res.match[1] == "list":
 					user = res.message.user.name.toLowerCase();
-					listAddrFromUser(user, function(err, data){
+					hu.listAddrFromUser(user, function(err, data){
 						if(err){
 							res.send(err);
 						}else{
@@ -97,7 +113,7 @@ function main(robot){
 				case /transaction (.*)/.test(res.match[1]):
 					user = res.message.user.name.toLowerCase();
 					tmp = res.match[1].split(" ");
-					getTransactionByAddr(addr, function(err,data){
+					eu.getTransactionByAddr(addr, function(err,data){
 						if(err){
 							console.error(err);
 						}
@@ -105,7 +121,7 @@ function main(robot){
 				break;
 				case res.match[1] == "transaction":
 					user = res.message.user.name.toLowerCase();
-					getTransactionByUser(user, function(err,data){
+					eu.getTransactionByUser(user, function(err,data){
 						if(err){
 							console.error(err);
 							res.send("Can't  get transation for the user :" + user);
@@ -136,7 +152,7 @@ function main(robot){
 					user = res.message.user.name.toLowerCase();
 					tmp = "";
 					var total = 0;
-					getNanopoolBalanceByUser(user, function(err, balances){
+					nanopool.getBalanceByUser(user, function(err, balances){
 						console.log(err,balances);
 						if(err){
 							console.error(err);
@@ -173,7 +189,7 @@ function main(robot){
 					user = res.message.user.name.toLowerCase();
 					tmp = "";
 					var total = 0;
-					getBalanceByUser(user, function(err,balances){
+					eu.getBalanceByUser(user, function(err,balances){
 						if(err){
 							res.send("Cannot get balance for user :", user);
 							return;
@@ -192,7 +208,7 @@ function main(robot){
 					user = res.message.user.name.toLowerCase();
 					tmp = "";
 					var total = 0;
-					getBalanceByUser(user, function(err,balances){
+					eu.getBalanceByUser(user, function(err,balances){
 						if(err){
 							res.send("Cannot get balance for user :", user);
 							return;
@@ -208,7 +224,7 @@ function main(robot){
 					});
 				break;
 				case res.match[1] == "price":
-						getPrice(function(err, data){
+						eu.getPrice(function(err, data){
 							if(err){
 								console.error("Erreur");
 								res.send("Can't get price");
@@ -228,265 +244,6 @@ function main(robot){
 			}
 		}
 	});
-
-	function addAddrToUser(addr, user, callback){
-		var list = robot.brain.get("ether_" + user) || [];
-
-		if(list.indexOf(addr) == -1){
-			list.push(addr);
-			robot.brain.set("ether_" + user, list);
-			callback(null, "Address added !");
-		}else{
-			callback("Address already exist", null);
-		}
-	}
-
-	function deleteAddrToUser(addr, user, callback){
-		var list = robot.brain.get("ether_" + user) || [];
-		var pos = list.indexOf(addr);
-		if( pos !== -1){
-			list.splice(pos, 1);
-			robot.brain.set("ether_" + user, list);
-			callback(null, "Address deleted !");
-		}else{
-			callback("Address doesn't exist !", null);
-		}
-	}
-
-	function listAddrFromUser(user, callback){
-		var list = robot.brain.get("ether_" + user) || [];
-		if(list.length > 0){
-			callback(null, list);
-		}else{
-			callback("No address found for user : "+ user , null);
-		}
-	}
-
-	function getNanopoolBalanceByAddr(addr, callback){
-
-		var baseUrl = "https://eth.nanopool.org/api/";
-		var method_url = "balance_hashrate/";
-		var addr_call = baseUrl + method_url + addr;
-		https.get(addr_call,function(res){
-			var data="";
-			var err = null;
-
-			res.on('data', function(d) {
-				data+=d;
-			});
-
-			res.on('end', function(){
-				try{
-					data = JSON.parse(data);
-					return callback(err, data);
-
-				}catch(e){
-					console.log('Erreur dans la recuperation de la balance : ', e);
-					console.log(data);
-					return callback("Erreur dans la balance", null);
-				}
-			});
-		});
-	}
-
-	function getBalanceByAddr(addr, callback){
-		var baseUrl = "https://etherchain.org/api/account/";
-		var addr_call = baseUrl+addr;
-
-		https.get(addr_call,function(res){
-			var data="";
-			var err = null;
-
-			res.on('data', function(d) {
-				data+=d;
-			});
-
-			res.on('end', function(){
-				try{
-					data = JSON.parse(data);
-					if(data.status !== 1){
-						callback("Erreur dans la balance", null);
-					}else{
-						callback(err, data);
-					}
-				}catch(e){
-					console.log('Erreur dans la recuperation de la balance : ', e);
-					console.log(data);
-					return callback("Erreur dans la balance", null);
-				}
-			});
-		});
-	}
-
-	function getBalanceByUser(user, callback){
-		listAddrFromUser(user, function(err, list){
-			var accounts = {};
-				accounts.data = [];
-			var done = 0;
-
-			if(err){
-				return callback(err, null);
-			}
-			
-			if(list.length == 0){
-				return callback("No addresses found", null);
-			}
-
-			for(var i = 0; i < list.length; i++){
-				(function(l, index, output){
-					var addr = l[index];
-					getBalanceByAddr(addr, function(err, data){
-
-						if(err){
-							return callback(err, null);
-						}
-						if(data.success){
-							accounts.success = 1;
-						}
-						accounts.data.push({"addr" : addr, "balance" : data.data[0].balance});
-						done++;
-
-						console.log(done + '/' + l.length);
-						
-						if(done == l.length){
-							return callback(null, accounts);
-						}
-					});
-				})(list, i, accounts);
-			}
-		
-		});
-	}
-
-	function getTransactionByAddr(addr, offset, callback){
-		// set default and errored offset to 0
-		if(!offset || offset < 0){
-			offset = 0;
-		}
-		var baseUrl = "https://etherchain.org/api/account/";
-		var addr_call = baseUrl+addr+"/tx/"+offset;
-
-		https.get(addr_call,function(res){
-			var data="";
-
-			res.on('data', function(d) {
-				data+=d;
-			});
-
-			res.on('end', function(){
-				try{
-					console.log(data);
-					data = JSON.parse(data);
-
-					if(data.status == 1){
-						delete data.status;
-						callback(null, data);
-					}else{
-						callback("Erreur dans les transactions", null);
-					}
-				}catch(e){
-					console.error('Erreur dans la recuperation des transactions : ', e);
-					// console.log(data);
-					callback("Erreur dans les transactions" + e, null);
-				}
-			});
-		});
-	}
-
-	function getTransactionByUser(user, callback){
-		console.log("user : ", user);
-		listAddrFromUser(user, function(err, list){
-			console.log("list : ", list);
-			var tx = [];
-			var done = 0;
-
-			if(err){
-				return callback(err, null);
-			}
-			for(var i = 0; i < list.length; i++){
-				(function(l, index, output){
-					var addr = l[index];
-					getTransactionByAddr(addr, 0,function(err, data){
-
-						if(err){
-							return callback(err, null);
-						}
-						tx = data.data;
-						console.log("tx :", tx);
-						done++;
-
-						console.log(done + '/' + l.length);
-						
-						if(done == l.length){
-							return callback(null, tx);
-						}
-					});
-				})(list, i, tx);
-			}
-		
-		});
-	}
-	
-	function getNanopoolBalanceByUser(user, callback){
-		listAddrFromUser(user, function(err, list){
-			var accounts = {};
-				accounts.data = [];
-			var done = 0;
-
-			if(err){
-				return callback(err, null);
-			}
-			for(var i = 0; i < list.length; i++){
-				(function(l, index, output){
-					var addr = l[index];
-					getNanopoolBalanceByAddr(addr, function(err, data){
-						console.log(data);
-						if(err){
-							console.error("cannot get : " + addr + " address for nanopool");
-						}
-						if(data && data.status){
-							accounts.data.push({"addr" : addr, "balance" : data.data.balance});
-						}
-						console.log(done + '/' + l.length);
-						
-						done++;
-						if(done == l.length){
-							return callback(null, accounts);
-						}
-					});
-				})(list, i, accounts);
-			}
-		
-		});
-	}
-
-	function getPrice(callback){
-		// https://coinmarketcap-nexuist.rhcloud.com/api/eth
-		var http = require("https");
-
-		var options = {
-			"method": "GET",
-			"hostname": "coinmarketcap-nexuist.rhcloud.com",
-			"port": null,
-			"path": "/api/eth"
-		};
-
-		var req = http.request(options, function (res) {
-			var chunks = [];
-
-			res.on("data", function (chunk) {
-				chunks.push(chunk);
-			});
-
-			res.on("end", function () {
-				var body = Buffer.concat(chunks);
-				var data = JSON.parse(body);
-				callback(null, data);
-			});
-		});
-
-		req.end();
-	}
 
 	function getHelp(){
 		return [

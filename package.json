@@ -1,0 +1,25 @@
+{
+  "name": "hubot-ethereum",
+  "version": "1.0.1",
+  "description": "Hubot script for ethereum network.",
+  "main": "ethereum.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Edznux/hubot-ethereum.git"
+  },
+  "keywords": [
+    "ethereum",
+    "hubot",
+    "script",
+    "hubot-ethereum"
+  ],
+  "author": "Edouard SCHWEISGUTH <edznux@gmail.com> (https://edouard.schweiguth.fr)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Edznux/hubot-ethereum/issues"
+  },
+  "homepage": "https://github.com/Edznux/hubot-ethereum#readme"
+}

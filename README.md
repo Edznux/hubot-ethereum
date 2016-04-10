@@ -9,6 +9,7 @@ Hubot script for ethereum network.
 ## Commands available
 
 - add <address> : Attach address to your user
+- rm | delete | remove <address> : Detach address from the current user
 - list : list addresses from the current user
 - check <address> : Get balance from the address provided
 - balance : Get the balance of the current user
