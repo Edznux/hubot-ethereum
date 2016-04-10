@@ -23,24 +23,13 @@ function main(robot){
 	var UNIT = 1000000000000000000;
 	var aToCurrency = {"usd": "$", "eur":"€"};
 	var currencyToA = {"$":"usd", "€": "eur"};
+
 	var hu = require("./lib/hubot_utils.js");
 	hu.setRobot(robot);
-	console.log(hu);
 	var eu = require("./lib/ethereum_utils.js");
-	console.log(eu);
+	eu.setRobot(robot);
 	var nanopool = require("./lib/nanopool.js");
-	console.log(nanopool);
 	
-
-
-/*
-	setInterval(function(){
-		eu.getPrice(function(err,data){
-			robot.brain.set("ether_price", data.price);
-			console.log(robot.brain.get("ether_price"));
-		}
-	}), 60000);
-*/
 	robot.hear(/ethereum( .*)?/i, function(res){
 		var addr, tmp, user;
 		
@@ -253,8 +242,6 @@ function main(robot){
 				" - check <address> : Get balance from the address provided",
 				" - balance : Get the balance of the current user",
 				" - nanopool [balance] : Get nanopool balance of the current user (if the miner has mined something)",
-				" - ethpool [balance] : Get ethpool balance of the current user (if the miner has mined something)",
-				" - ethereumpool [balance] : Get ethereumpool balance of the current user (if the miner has mined something)",
 				" - transaction : List latest transaction of the current user",
 				" - price : value of ethereum",
 				" - p : alias for price"
