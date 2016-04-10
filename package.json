@@ -1,6 +1,6 @@
 {
   "name": "hubot-ethereum",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Hubot script for ethereum network.",
   "main": "ethereum.js",
   "scripts": {
