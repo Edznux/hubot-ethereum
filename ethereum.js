@@ -17,6 +17,9 @@
 
 var https = require("https");
 
+var DEFAULT_PRICE_CURRENCY = "eur";
+var SECOND_PRICE_CURRENCY = "usd";
+
 function main(robot){
 	
 	var UNIT = 1000000000000000000;
@@ -223,7 +226,7 @@ function main(robot){
 								res.send("Can't get price");
 								return;
 							}
-							res.send("Current value of ether : "+ parseFloat(data.price.eur).toFixed(3) + "€" + " ($" + parseFloat(data.price.usd).toFixed(3) + ")");
+							res.send("Current value of ether : "+ parseFloat(data.price[DEFAULT_PRICE_CURRENCY]).toFixed(3) + "€" + " ($" + parseFloat(data.price[SECOND_PRICE_CURRENCY]).toFixed(3) + ")");
 						});
 					break;
 				case res.match[1] == "?":
