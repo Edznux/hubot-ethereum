@@ -17,7 +17,6 @@
 
 var https = require("https");
 
-
 function main(robot){
 	
 	var UNIT = 1000000000000000000;
@@ -36,8 +35,6 @@ function main(robot){
 		if(res.message.rawText.match(/^ethereum/i)){
 
 			res.match[1] = res.match[1].trim();
-			console.log(res.match[1]);
-
 			switch(true){
 				case /check/.test(res.match[1]):
 					tmp = res.match[1].split(" ");
@@ -137,7 +134,6 @@ function main(robot){
 
 				case res.match[1] == "nanopool":
 				case res.match[1] == "nanopool balance":
-					console.log(res.match[1]);
 					user = res.message.user.name.toLowerCase();
 					tmp = "";
 					var total = 0;
@@ -165,31 +161,39 @@ function main(robot){
 					break;
 				case /balance (.*)/.test(res.match[1]) :
 
-					tmp = res.match[1].split(" ");
+					var currency = res.match[1].split(" ")[1];
 					var currencyMult; 
-					if(tmp[1] == "$" || tmp[1] == "€"){
-						currencyMult = robot.brain.get("ether_price")[currencyToA[tmp[1]]];
+					
+					if(currency == "$" || currency == "€"){
+						currencyMult = robot.brain.get("ether_price").price[currencyToA[currency]];
 					}
-					else if(tmp[1] == "eur" || tmp[1] == "usd"){
-						currencyMult = robot.brain.get("ether_price")[tmp[1]];
+					else if(currency == "eur" || currency == "usd"){
+						currencyMult = robot.brain.get("ether_price").price[currency];
 					}else{
 						res.send("Currency not found");
 					}
+
 					user = res.message.user.name.toLowerCase();
-					tmp = "";
-					var total = 0;
 					eu.getBalanceByUser(user, function(err,balances){
+						var tmp = "";
+						var data = balances.data;
+						var total = 0;
+						var value;
+
 						if(err){
 							res.send("Cannot get balance for user :", user);
 							return;
 						}
-						data = balances.data;
+						
 						for(var i=0; i < data.length; i++){
-							tmp += "Adress : [" + data[i].addr + "] balance : ["+ (data[i].balance/UNIT) * currencyMult + "] \n";
+							value = (data[i].balance/UNIT) * currencyMult;
+							tmp += "Adress : [`" + data[i].addr + "`] balance : [`"+ parseFloat(value).toFixed(3) + "`] \n";
 							total += data[i].balance;
 						}
+						
 						tmp += "-------\n";
-						tmp += "Total : " + (total/UNIT) * currencyMult + " over " + data.length + " account(s)";
+						tmp += "Total : " + parseFloat( (total/UNIT)*currencyMult ).toFixed(3) + currency + " over " + data.length + " account(s)";
+						
 						res.send(tmp);
 					});
 				break;
@@ -241,6 +245,7 @@ function main(robot){
 				" - list : list addresses from the current user",
 				" - check <address> : Get balance from the address provided",
 				" - balance : Get the balance of the current user",
+				" - balance <€ or $>: Get the balance of the current user in the provided currency",
 				" - nanopool [balance] : Get nanopool balance of the current user (if the miner has mined something)",
 				" - transaction : List latest transaction of the current user",
 				" - price : value of ethereum",
