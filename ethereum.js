@@ -134,7 +134,43 @@ function main(robot){
 
 					});
 				break;
+				case /nanopool (.*)/.test(res.match[1]):
+					user = res.message.user.name.toLowerCase();
+					tmp = "";
+					var currency = res.match[1].split(" ")[1];
+					var currencyMult; 
+					
+					if(currency == "$" || currency == "€"){
+						currencyMult = robot.brain.get("ether_price").price[currencyToA[currency]];
+					}
+					else if(currency == "eur" || currency == "usd"){
+						currencyMult = robot.brain.get("ether_price").price[currency];
+					}else{
+						res.send("Currency not found");
+					}
+					var total = 0;
+					nanopool.getBalanceByUser(user, function(err, balances){
+						console.log(err,balances);
+						if(err){
+							console.error(err);
+							res.send(err);
+							return;
+						}
+						data = balances.data;
+						if(err){
+							res.send("Cannot get balance for user :", user);
+							return;
+						}
+						for(var i = 0; i < data.length; i++){
+							tmp += "Adress : [" + data[i].addr + "] balance : ["+ parseFloat(data[i].balance*currencyMult).toFixed(3) + " "+ currency +"] \n";
+							total += data[i].balance;
+						}
+						tmp += "-------\n";
+						tmp += "Total : " + parseFloat(total*currencyMult).toFixed(3) + " "+ currency+ " over " + data.length + " account(s)";
+						res.send(tmp);
 
+					});
+					break;
 				case res.match[1] == "nanopool":
 				case res.match[1] == "nanopool balance":
 					user = res.message.user.name.toLowerCase();
@@ -250,6 +286,7 @@ function main(robot){
 				" - balance : Get the balance of the current user",
 				" - balance <€ or $>: Get the balance of the current user in the provided currency",
 				" - nanopool [balance] : Get nanopool balance of the current user (if the miner has mined something)",
+				" - nanopool <€ or $> : Get nanopool balance of the current user in the provided currency",
 				" - transaction : List latest transaction of the current user",
 				" - price : value of ethereum",
 				" - p : alias for price"
