@@ -138,16 +138,6 @@ function main(robot){
 					user = res.message.user.name.toLowerCase();
 					tmp = "";
 					var currency = res.match[1].split(" ")[1];
-					var currencyMult; 
-					
-					if(currency == "$" || currency == "€"){
-						currencyMult = robot.brain.get("ether_price").price[currencyToA[currency]];
-					}
-					else if(currency == "eur" || currency == "usd"){
-						currencyMult = robot.brain.get("ether_price").price[currency];
-					}else{
-						res.send("Currency not found");
-					}
 					var total = 0;
 					nanopool.getBalanceByUser(user, function(err, balances){
 						console.log(err,balances);
@@ -162,7 +152,7 @@ function main(robot){
 							return;
 						}
 						for(var i = 0; i < data.length; i++){
-							tmp += "Adress : [" + data[i].addr + "] balance : ["+ parseFloat(data[i].balance*currencyMult).toFixed(3) + " "+ currency +"] \n";
+							tmp += "Adress : [" + data[i].addr + "] balance : ["+ parseFloat(ethToCurrency(data[i].balance, currency)).toFixed(3) + " "+ currency +"] \n";
 							total += data[i].balance;
 						}
 						tmp += "-------\n";
@@ -201,16 +191,6 @@ function main(robot){
 				case /balance (.*)/.test(res.match[1]) :
 
 					var currency = res.match[1].split(" ")[1];
-					var currencyMult; 
-					
-					if(currency == "$" || currency == "€"){
-						currencyMult = robot.brain.get("ether_price").price[currencyToA[currency]];
-					}
-					else if(currency == "eur" || currency == "usd"){
-						currencyMult = robot.brain.get("ether_price").price[currency];
-					}else{
-						res.send("Currency not found");
-					}
 
 					user = res.message.user.name.toLowerCase();
 					eu.getBalanceByUser(user, function(err,balances){
@@ -225,7 +205,7 @@ function main(robot){
 						}
 						
 						for(var i=0; i < data.length; i++){
-							value = (data[i].balance/UNIT) * currencyMult;
+							value = ethToCurrency(data[i].balance/UNIT), currency);
 							tmp += "Adress : [`" + data[i].addr + "`] balance : [`"+ parseFloat(value).toFixed(3) + "`] \n";
 							total += data[i].balance;
 						}
