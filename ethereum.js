@@ -112,7 +112,7 @@ function main(robot){
 			}
 			data = balances.data;
 			for(var i=0; i < data.length; i++){
-				tmp += "Adress : [" + data[i].addr + "] balance : ["+ data[i].balance/UNIT + " ETH] \n";
+				tmp += "Adress : [`" + data[i].addr + "`] balance : [`"+ data[i].balance/UNIT + " ETH`] \n";
 				total += data[i].balance;
 			}
 			tmp += "-------\n";
@@ -143,7 +143,7 @@ function main(robot){
 			}
 			
 			tmp += "-------\n";
-			tmp += "Total : " + parseFloat(hu.ethToCurrency(total/UNIT, currency).value).toFixed(3) + currency + " over " + data.length + " account(s)";
+			tmp += "Total : `" + parseFloat(hu.ethToCurrency(total/UNIT, currency).value).toFixed(3) + currency + "` over " + data.length + " account(s)";
 			
 			res.send(tmp);
 		});
@@ -204,11 +204,11 @@ function main(robot){
 				return;
 			}
 			for(var i = 0; i < data.length; i++){
-				tmp += "Adress : [" + data[i].addr + "] balance : ["+ data[i].balance + " ETH] \n";
+				tmp += "Adress : [`" + data[i].addr + "`] balance : [`"+ data[i].balance + " ETH`] \n";
 				total += data[i].balance;
 			}
 			tmp += "-------\n";
-			tmp += "Total : " + total + " ETH over " + data.length + " account(s)";
+			tmp += "Total : `" + total + " ETH` over " + data.length + " account(s)";
 			res.send(tmp);
 
 		});
@@ -232,11 +232,11 @@ function main(robot){
 				return;
 			}
 			for(var i = 0; i < data.length; i++){
-				tmp += "Adress : [" + data[i].addr + "] balance : ["+ parseFloat(hu.ethToCurrency(data[i].balance, currency).value).toFixed(3) + " "+ currency +"] \n";
+				tmp += "Adress : [`" + data[i].addr + "`] balance : [`"+ parseFloat(hu.ethToCurrency(data[i].balance, currency).value).toFixed(3) + " "+ currency +"`] \n";
 				total += data[i].balance;
 			}
 			tmp += "-------\n";
-			tmp += "Total : " + parseFloat(total*currencyMult).toFixed(3) + " "+ currency+ " over " + data.length + " account(s)";
+			tmp += "Total : `" + parseFloat(total*currencyMult).toFixed(3) + " "+ currency+ "` over " + data.length + " account(s)";
 			res.send(tmp);
 
 		});
@@ -303,7 +303,7 @@ function main(robot){
 				return;
 			}
 			console.log(data.data[0].balance);
-			res.send("Balance : " + data.data[0].balance/UNIT + "ETH");
+			res.send("Balance : `" + data.data[0].balance/UNIT + "ETH`");
 		});
 	}
 	function _getPrice(res){
@@ -313,7 +313,7 @@ function main(robot){
 				res.send("Can't get price");
 				return;
 			}
-			res.send("Current value of ether : "+ parseFloat(data.price[DEFAULT_PRICE_CURRENCY]).toFixed(3) + "€" + " ($" + parseFloat(data.price[SECOND_PRICE_CURRENCY]).toFixed(3) + ")");
+			res.send("Current value of ether : `"+ parseFloat(data.price[DEFAULT_PRICE_CURRENCY]).toFixed(3) + "€" + " ($" + parseFloat(data.price[SECOND_PRICE_CURRENCY]).toFixed(3) + ")`");
 		});
 	}
 }
