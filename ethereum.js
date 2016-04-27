@@ -72,6 +72,9 @@ function main(robot){
 				case res.match[1] == "price":
 					_getPrice(res);
 					break;
+				case res.match[1] == "version":
+						res.send(require("./package.json").version);
+					break;
 
 				case res.match[1] == "?":
 				case res.match[1] == "help":
@@ -116,7 +119,7 @@ function main(robot){
 				total += data[i].balance;
 			}
 			tmp += "-------\n";
-			tmp += "Total : " + total/UNIT + " ETH over " + data.length + " account(s)";
+			tmp += "Total : `" + parseFloat(total/UNIT).toFixed(3) + "` ETH over " + data.length + " account(s)";
 			res.send(tmp);
 		});
 	}
