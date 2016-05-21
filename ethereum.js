@@ -36,7 +36,13 @@ function main(robot){
 			res.match[1] = res.match[1].trim();
 			switch(true){
 				case /check/.test(res.match[1]):
-					_check(res);
+					if(/\$|\€/.test(res.match[1])){
+						console.info("€ or $ found");
+						_checkByCurrency(res);
+					}else{
+						console.info("€ or $ NOT found");
+						_check(res);
+					}
 					break;
 				case /add/.test(res.match[1]):
 					_addAddr(res);
@@ -315,6 +321,20 @@ function main(robot){
 			res.send("Balance : `" + data.data[0].balance/UNIT + " ETH`");
 		});
 	}
+	function _checkByCurrency(res){
+		var tmp = res.match[1].split(" ");
+		var addr = tmp[1];
+		var currency = tmp[2];
+		eu.getBalanceByAddr(addr, function(err, data){
+			if(err){
+				res.send("Cannot get balance of " + addr);
+				return;
+			}
+			console.log(data.data[0].balance);
+			res.send("Balance : `" + parseFloat(hu.ethToCurrency(data.data[0].balance/UNIT, currency).value).toFixed(3) + " " +currency + "`");
+		});
+	}
+
 	function _getPrice(res){
 		eu.getPrice(function(err, data){
 			if(err){

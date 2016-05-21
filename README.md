@@ -62,6 +62,9 @@ Total : `0.11554653076249481 ETH` over 2 account(s)
 > {hubot} ethereum check 0x4e9417353300d7564cb9e9dcf0ed3d3d95fcd6eb
 Balance : 3.1348954201224757 ETH
 
+> {hubot} ethereum check 0x4e9417353300d7564cb9e9dcf0ed3d3d95fcd6eb € 
+Balance : 37.796 €
+
 ```
 
 ## Installation
