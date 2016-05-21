@@ -312,7 +312,7 @@ function main(robot){
 				return;
 			}
 			console.log(data.data[0].balance);
-			res.send("Balance : `" + data.data[0].balance/UNIT + "ETH`");
+			res.send("Balance : `" + data.data[0].balance/UNIT + " ETH`");
 		});
 	}
 	function _getPrice(res){
