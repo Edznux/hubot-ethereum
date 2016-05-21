@@ -92,20 +92,20 @@ function main(robot){
 		return [
 			"Ethereum commands",
 				" - add <address> : Attach address to your user",
+				" - delete <address> : Delete address from your user",
+				" - remove <address> : Alias for delete",
+				" - rm <address> : Alias for delete",
 				" - list : list addresses from the current user",
-				" - check <address> : Get balance from the address provided",
 				" - balance : Get the balance of the current user",
 				" - balance <€ or $> : Get the balance of the current user in the provided currency",
-				" - delete <address> : Delete address from your user",
-				" - help : Print this help",
 				" - nanopool [balance] : Get nanopool balance of the current user (if the miner has mined something)",
 				" - nanopool <€ or $> : Get nanopool balance of the current user in the provided currency",
 				" - transaction : List latest transaction of the current user",
+				" - check <address> : Get balance from the address provided",
 				" - price : value of ethereum",
 				" - p : alias for price",
-				" - remove <address> : Alias for delete",
-				" - rm <address> : Alias for delete",
 				" - version : Print current version of hubot-ethereum",
+				" - help : Print this help",
 				" - ? : Alias for help"
 				].join("\n\t");
 	}
