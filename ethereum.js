@@ -125,6 +125,7 @@ function main(robot){
 				res.send("Cannot get balance for user :", user);
 				return;
 			}
+			console.error("======", balances);
 			data = balances.data;
 			for(var i=0; i < data.length; i++){
 				tmp += "Adress : [`" + data[i].addr + "`] balance : [`"+ data[i].balance/UNIT + " ETH`] \n";
@@ -150,17 +151,21 @@ function main(robot){
 				res.send("Cannot get balance for user :", user);
 				return;
 			}
+			try{
+				for(var i=0; i < data.length; i++){
+					value = hu.ethToCurrency(data[i].balance/UNIT, currency);
+					tmp += "Adress : [`" + data[i].addr + "`] balance : [`" + value+ "`] \n";
+					total += data[i].balance;
+				}
+				tmp += "-------\n";
+				tmp += "Total : `" + parseFloat(hu.ethToCurrency(total/UNIT, currency)).toFixed(3) + currency + "` over " + data.length + " account(s)";
 			
-			for(var i=0; i < data.length; i++){
-				value = hu.ethToCurrency(data[i].balance/UNIT, currency).value;
-				tmp += "Adress : [`" + data[i].addr + "`] balance : [`" + value+ "`] \n";
-				total += data[i].balance;
+				res.send(tmp);
+			
+			}catch(e){
+				res.send("Cannot get balance by currency : " + e);
 			}
 			
-			tmp += "-------\n";
-			tmp += "Total : `" + parseFloat(hu.ethToCurrency(total/UNIT, currency).value).toFixed(3) + currency + "` over " + data.length + " account(s)";
-			
-			res.send(tmp);
 		});
 	}
 
@@ -202,6 +207,7 @@ function main(robot){
 			res.send(data);
 		});
 	}
+
 	function _getNanopoolBalance(res){
 		var user = res.message.user.name.toLowerCase();
 		var tmp = "";
@@ -246,13 +252,20 @@ function main(robot){
 				res.send("Cannot get balance for user :", user);
 				return;
 			}
-			for(var i = 0; i < data.length; i++){
-				tmp += "Adress : [`" + data[i].addr + "`] balance : [`"+ parseFloat(hu.ethToCurrency(data[i].balance, currency).value).toFixed(3) + " "+ currency +"`] \n";
-				total += data[i].balance;
+
+			try{			
+				for(var i = 0; i < data.length; i++){
+					tmp += "Adress : [`" + data[i].addr + "`] balance : [`"+ parseFloat(hu.ethToCurrency(data[i].balance, currency)).toFixed(3) + " "+ currency +"`] \n";
+					total += data[i].balance;
+				}
+				tmp += "-------\n";
+				tmp += "Total : `" + parseFloat(total*currencyMult).toFixed(3) + " "+ currency+ "` over " + data.length + " account(s)";
+				res.send(tmp);
+			
+			}catch(e){
+				res.send("Cannot get nanopool balance by currency : " +e);
+				return;
 			}
-			tmp += "-------\n";
-			tmp += "Total : `" + parseFloat(total*currencyMult).toFixed(3) + " "+ currency+ "` over " + data.length + " account(s)";
-			res.send(tmp);
 
 		});
 	}
@@ -294,6 +307,7 @@ function main(robot){
 	function _addAddr(res){
 		var user = res.message.user.name.toLowerCase();
 		var tmp = res.match[1].split(" ");
+
 		console.log("Add address :", tmp[1], "to user :", user, "[", new Date(), "]");
 
 		if(tmp.length < 2){
@@ -321,6 +335,7 @@ function main(robot){
 			res.send("Balance : `" + data.data[0].balance/UNIT + " ETH`");
 		});
 	}
+
 	function _checkByCurrency(res){
 		var tmp = res.match[1].split(" ");
 		var addr = tmp[1];
@@ -331,14 +346,18 @@ function main(robot){
 				return;
 			}
 			console.log(data.data[0].balance);
-			res.send("Balance : `" + parseFloat(hu.ethToCurrency(data.data[0].balance/UNIT, currency).value).toFixed(3) + " " +currency + "`");
+			try{
+				res.send("Balance : `" + parseFloat(hu.ethToCurrency(data.data[0].balance/UNIT, currency)).toFixed(3) + " " +currency + "`");
+			}catch(e){
+				res.send("Cannot check address by currency : " + e);
+			}
 		});
 	}
 
 	function _getPrice(res){
 		eu.getPrice(function(err, data){
 			if(err){
-				console.error("Erreur");
+				console.error("Error" + err);
 				res.send("Can't get price");
 				return;
 			}
