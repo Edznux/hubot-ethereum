@@ -20,6 +20,7 @@ Hubot script for ethereum network.
 - transaction : List latest transaction of the current user
 - check <address> : Get balance from the address provided 
 - price : value of ethereum
+- convert <value> <from> <to> : convert value from currency to another (<to> default = eth)
 - p : alias for price
 - version : Print current version of hubot-ethereum
 - help : Print this help 

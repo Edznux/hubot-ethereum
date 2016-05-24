@@ -86,6 +86,9 @@ function main(robot){
 				case res.match[1] == "help":
 					res.send(getHelp());
 					break;
+				case /convert (.*)/.test(res.match[1]):
+					_getConvertion(res);
+					break;
 
 				default:
 					res.send(getHelp());
@@ -109,6 +112,7 @@ function main(robot){
 				" - transaction : List latest transaction of the current user",
 				" - check <address> : Get balance from the address provided",
 				" - price : value of ethereum",
+				" - convert <value> <from> <to> : convert value from currency to another (<to> default = eth)") ",
 				" - p : alias for price",
 				" - version : Print current version of hubot-ethereum",
 				" - help : Print this help",
@@ -361,8 +365,26 @@ function main(robot){
 				res.send("Can't get price");
 				return;
 			}
-			res.send("Current value of ether : `"+ parseFloat(data.price[DEFAULT_PRICE_CURRENCY]).toFixed(3) + "€" + " ($" + parseFloat(data.price[SECOND_PRICE_CURRENCY]).toFixed(3) + ")`");
+			res.send("Current value of ether : `"+ parseFloat(data.price[DEFAULT_PRICE_CURRENCY]).toFixed(3) + DEFAULT_PRICE_CURRENCY + " (" + parseFloat(data.price[SECOND_PRICE_CURRENCY]).toFixed(3) + SECOND_PRICE_CURRENCY + ")`");
 		});
+	}
+
+	function _getConvertion(res){
+		var split = res.match[1].split(" ");
+		//split 0 == "convert"
+		var value = split[1];
+		var base = split[2];
+		var dest = split[3] || "eth"; // "eth" not required
+		console.log("Value :", value);
+		console.log("base :", base);
+		console.log("dest :", dest);
+
+		if(dest == "€" || dest == "$"){
+			res.send(value + " " + base + " = " + parseFloat( hu.ethToCurrency(value, dest) ).toFixed(3) + " "+ dest);
+		}else if(dest == "eth"){
+			res.send(value + " " + base + " = " + parseFloat( hu.currencyToEth(value, base) ).toFixed(3) + " "+ dest);
+		}
+
 	}
 }
 
