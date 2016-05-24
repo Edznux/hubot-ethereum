@@ -30,8 +30,8 @@ function main(robot){
 	eu.setRobot(robot);
 	var nanopool = require("./lib/nanopool.js");
 	
-	robot.hear(/ethereum( .*)?/i, function(res){
-		if(res.message.rawText.match(/^ethereum/i)){
+	robot.hear(/(?:ethereum|eth)( .*)?/i, function(res){
+		if(res.message.rawText.match(/^(?:ethereum|eth)/i)){
 
 			res.match[1] = res.match[1].trim();
 			switch(true){
@@ -112,7 +112,7 @@ function main(robot){
 				" - transaction : List latest transaction of the current user",
 				" - check <address> : Get balance from the address provided",
 				" - price : value of ethereum",
-				" - convert <value> <from> <to> : convert value from currency to another (<to> default = eth)") ",
+				" - convert <value> <from> <to> : convert value from currency to another (<to> default = eth)",
 				" - p : alias for price",
 				" - version : Print current version of hubot-ethereum",
 				" - help : Print this help",
