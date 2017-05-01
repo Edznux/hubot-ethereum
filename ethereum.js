@@ -365,7 +365,7 @@ function main(robot){
 				res.send("Can't get price");
 				return;
 			}
-			res.send("Current value of ether : `"+ parseFloat(data.price[DEFAULT_PRICE_CURRENCY]).toFixed(3) + DEFAULT_PRICE_CURRENCY + " (" + parseFloat(data.price[SECOND_PRICE_CURRENCY]).toFixed(3) + SECOND_PRICE_CURRENCY + ")`");
+			res.send("Current value of ether : `"+ parseFloat(data[0]["price_"+DEFAULT_PRICE_CURRENCY]).toFixed(3) + DEFAULT_PRICE_CURRENCY + " (" + parseFloat(data[0]["price_"+SECOND_PRICE_CURRENCY]).toFixed(3) + SECOND_PRICE_CURRENCY + ")`");
 		});
 	}
 
