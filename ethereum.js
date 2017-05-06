@@ -21,7 +21,7 @@ var DEFAULT_PRICE_CURRENCY = "eur";
 var SECOND_PRICE_CURRENCY = "usd";
 
 function main(robot){
-	
+
 	var UNIT = 1000000000000000000;
 
 	var hu = require("./lib/hubot_utils.js");
@@ -29,7 +29,7 @@ function main(robot){
 	var eu = require("./lib/ethereum_utils.js");
 	eu.setRobot(robot);
 	var nanopool = require("./lib/nanopool.js");
-	
+
 	robot.hear(/(?:ethereum|eth)( .*)?/i, function(res){
 		if(res.message.rawText.match(/^(?:ethereum|eth)/i)){
 
@@ -163,13 +163,13 @@ function main(robot){
 				}
 				tmp += "-------\n";
 				tmp += "Total : `" + parseFloat(hu.ethToCurrency(total/UNIT, currency)).toFixed(3) + currency + "` over " + data.length + " account(s)";
-			
+
 				res.send(tmp);
-			
+
 			}catch(e){
 				res.send("Cannot get balance by currency : " + e);
 			}
-			
+
 		});
 	}
 
@@ -257,7 +257,7 @@ function main(robot){
 				return;
 			}
 
-			try{			
+			try{
 				for(var i = 0; i < data.length; i++){
 					tmp += "Adress : [`" + data[i].addr + "`] balance : [`"+ parseFloat(hu.ethToCurrency(data[i].balance, currency)).toFixed(3) + " "+ currency +"`] \n";
 					total += data[i].balance;
@@ -265,7 +265,7 @@ function main(robot){
 				tmp += "-------\n";
 				tmp += "Total : `" + parseFloat(total*currencyMult).toFixed(3) + " "+ currency+ "` over " + data.length + " account(s)";
 				res.send(tmp);
-			
+
 			}catch(e){
 				res.send("Cannot get nanopool balance by currency : " +e);
 				return;
