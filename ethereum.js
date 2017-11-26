@@ -53,6 +53,9 @@ function main(robot){
 				case res.match[1] == "list":
 					_getList(res);
 					break;
+				case /graph(.*)/.test(res.match[1]):
+					_printGraph(res);
+					break;
 				case /transaction (.*)/.test(res.match[1]):
 					_getTransactionByAddr(res);
 					break;
@@ -114,10 +117,42 @@ function main(robot){
 				" - price : value of ethereum",
 				" - convert <value> <from> <to> : convert value from currency to another (<to> default = eth)",
 				" - p : alias for price",
+				" - graph [<period> <format>]",
 				" - version : Print current version of hubot-ethereum",
 				" - help : Print this help",
 				" - ? : Alias for help"
 				].join("\n\t");
+	}
+
+	/*
+	* eth graph [<period> <format>]
+	* period in [24h, 7d, 30d, 1y] 
+	* Format in [png,svg]
+	* Send the graph link in response
+	*
+	* Print the btc graph for the period giver
+	* @params :
+	*       - res : response from robot
+	*/
+
+	function _printGraph(res){
+		
+		var user = res.message.user.name.toLowerCase();
+		var split = res.match[1].split(" ");
+		var period = split[1] || "24h";
+		var format = split[2] || "png";
+
+		if( !(format == "svg" || format == "png")){
+			return res.send("Unsupported format");
+		}
+		
+		if( !(period == "24h" || period == "7d" || period == "30d" || period == "1y") ){
+			return res.send("Format not in 24h, 7d, 30d, 1y");
+		}
+
+		var url = "https://cryptohistory.org/charts/dark/eth-usdt/"+period+"/"+format+"?nonce="+Math.floor(Math.random()*10000);
+		
+		res.send("Graph : ETH / usdt over " + period+ "\n"+ url )
 	}
 
 	function _getBalance(res){
@@ -147,9 +182,15 @@ function main(robot){
 		var user = res.message.user.name.toLowerCase();
 		eu.getBalanceByUser(user, function(err,balances){
 			var tmp = "";
-			var data = balances.data;
+			var data;
 			var total = 0;
 			var value;
+			
+			if(balances.data){
+				data = balances.data;
+			}else{
+				err = "Empty balances"
+			}
 
 			if(err){
 				res.send("Cannot get balance for user :", user);
