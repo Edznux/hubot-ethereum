@@ -223,7 +223,6 @@ function main(robot){
 				return;
 			}
 			tmp = "";
-			console.log(data);
 			var m, dateString;
 
 			for(var i = 0; i< data.length && i < 10; i++){
