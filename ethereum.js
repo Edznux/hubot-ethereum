@@ -16,7 +16,7 @@
 //
 
 var https = require("https");
-import {version} from './package.json';
+var {version} = require('./package.json');
 
 var DEFAULT_PRICE_CURRENCY = "EUR";
 var SECOND_PRICE_CURRENCY = "USD";
