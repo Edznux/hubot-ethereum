@@ -16,12 +16,13 @@
 //
 
 var https = require("https");
+import {version} from './package.json';
 
-var DEFAULT_PRICE_CURRENCY = "eur";
-var SECOND_PRICE_CURRENCY = "usd";
+var DEFAULT_PRICE_CURRENCY = "EUR";
+var SECOND_PRICE_CURRENCY = "USD";
 
 function main(robot){
-
+	console.log("hubot ethereum version", version)
 	var UNIT = 1000000000000000000;
 
 	var hu = require("./lib/hubot_utils.js");
@@ -405,6 +406,7 @@ function main(robot){
 				res.send("Can't get price");
 				return;
 			}
+			console.log("Current data is : ", data)
 			res.send("Current value of ether : `"+ parseFloat(data[DEFAULT_PRICE_CURRENCY]).toFixed(3) + DEFAULT_PRICE_CURRENCY + " (" + parseFloat(data[SECOND_PRICE_CURRENCY]).toFixed(3) + SECOND_PRICE_CURRENCY + ")`");
 		});
 	}
